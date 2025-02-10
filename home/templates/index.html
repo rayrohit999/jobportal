@@ -4,13 +4,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>{% block title %}Home{% endblock %}</title>
+    <title>{% block title %}CareerHub{% endblock %}</title>
 </head>
 <body>
     {% block content %}
-        <h1>Home</h1>
-        <p>Welcome to the home page!</p>
+    <!-- Main Content -->
+    <div class="container text-center mt-5 content">
+        <h1 class="display-4">Welcome to CareerHub</h1>
+        <p class="lead">Find your dream job or hire top talent with ease.</p>
+        
+        <a href="/jobs/" class="btn btn-primary btn-lg mt-3">Browse Jobs</a>
+        <a href="/post-job/" class="btn btn-success btn-lg mt-3">Post a Job</a>
+        
+        <!-- Additional Content -->
+        <div class="row mt-5">
+            <div class="col-md-4">
+                <h3>For Job Seekers</h3>
+                <p>Explore thousands of job opportunities tailored to your skills and experience.</p>
+            </div>
+            <div class="col-md-4">
+                <h3>For Employers</h3>
+                <p>Post job listings and find the perfect candidate for your company.</p>
+            </div>
+            <div class="col-md-4">
+                <h3>Career Advice</h3>
+                <p>Get expert career guidance and tips to boost your professional journey.</p>
+            </div>
+        </div>
+
+        <!-- More Sections -->
+        <div class="row mt-5 mb-5">
+            <div class="col-md-6">
+                <h3>Why Choose CareerHub?</h3>
+                <ul class="list-group">
+                    <li class="list-group-item">✔ Access to thousands of job listings</li>
+                    <li class="list-group-item">✔ Easy application process</li>
+                    <li class="list-group-item">✔ Verified employers and job postings</li>
+                    <li class="list-group-item">✔ Career resources and expert guidance</li>
+                </ul>
+            </div>
+            <div class="col-md-6">
+                <h3>Success Stories</h3>
+                <p>Read inspiring stories of job seekers who found their dream jobs through CareerHub.</p>
+                <blockquote class="blockquote">
+                    "CareerHub helped me land my dream job in just two weeks! Highly recommended!" - <strong>Rahul Gupta</strong>
+                </blockquote>
+            </div>
+        </div>
+    </div>
     {% endblock %}
 </body>
 </html>
+
