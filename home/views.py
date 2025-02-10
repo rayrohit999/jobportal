@@ -2,4 +2,8 @@ from django.shortcuts import render
 
 # Create your views here.
 def home(request):
-    return render(request,'index.html')
+    context={
+        'name':'Rahul Gupta',
+        'content':'CareerHub helped me land my dream job in just two weeks! Highly recommended!'
+    }
+    return render(request,'home/index.html',context)
