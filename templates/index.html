@@ -18,8 +18,16 @@
                 </div>
             </form>
             <div class="flex flex-wrap justify-center gap-4">
+                {% if user.is_authenticated %}
+                {% if user.is_recruiter%}
+                <a href="{% url 'post_job' %}" class="bg-white text-blue-600 px-8 py-3 rounded-full font-medium hover:bg-blue-50 transition shadow-lg">Post Jobs</a>
+                {%else%}
+                <a href="{% url 'list_jobs' %}" class="bg-transparent border-2 border-white text-white px-8 py-3 rounded-full font-medium hover:bg-white hover:text-blue-600 transition">Browse Jobs</a>
+                {%endif%}
+                {% else %}
                 <a href="{% url 'register' %}" class="bg-white text-blue-600 px-8 py-3 rounded-full font-medium hover:bg-blue-50 transition shadow-lg">Get Started</a>
                 <a href="{% url 'list_jobs' %}" class="bg-transparent border-2 border-white text-white px-8 py-3 rounded-full font-medium hover:bg-white hover:text-blue-600 transition">Browse Jobs</a>
+                {% endif %}
             </div>
         </div>
     </div>
@@ -36,11 +44,11 @@
                             <img src="{{ job.posted_by.profile_picture.url }}" alt="{{ job.company_name }}" class="w-12 h-12 rounded-full">
                             <div>
                                 <h3 class="text-xl font-semibold text-gray-800">{{ job.title }}</h3>
-                                <p class="text-gray-600">{{ job.company_name }}</p>
+                                <p class="text-gray-600">{{ job.company }}</p>
                             </div>
                         </div>
                         <div class="flex justify-between items-center">
-                            <span class="text-blue-600 font-medium">{{ job.employment_type }}</span>
+                            <span class="text-blue-600 font-medium">{{ job.job_type }}</span>
                             <span class="text-gray-600">{{ job.location }}</span>
                         </div>
                     </div>

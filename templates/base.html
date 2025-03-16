@@ -24,7 +24,7 @@
                     <a href="{% url 'home' %}" class="text-gray-700 hover:text-blue-600 transition">Home</a>
                     <a href="{% url 'list_jobs' %}" class="text-gray-700 hover:text-blue-600 transition">Find Jobs</a>
                     {% if user.is_authenticated %}
-                        <a href="{% url 'dashboard' %}" class="text-gray-700 hover:text-blue-600 transition">Profile</a>
+                        <a href="{% url 'dashboard' %}" class="text-gray-700 hover:text-blue-600 transition">Dashboard</a>
                         <a href="{% url 'logout' %}" class="text-gray-700 hover:text-blue-600 transition">Logout</a>
                     {% else %}
                         <a href="{% url 'register' %}" class="text-gray-700 hover:text-blue-600 transition">Register</a>
@@ -46,7 +46,7 @@
                 <a href="{% url 'home' %}" class="block text-gray-700 hover:text-blue-600 transition">Home</a>
                 <a href="{% url 'list_jobs' %}" class="block text-gray-700 hover:text-blue-600 transition">Find Jobs</a>
                 {% if user.is_authenticated %}
-                    <a href="{% url 'dashboard' %}" class="block text-gray-700 hover:text-blue-600 transition">Profile</a>
+                    <a href="{% url 'dashboard' %}" class="block text-gray-700 hover:text-blue-600 transition">Dashboard</a>
                     <a href="{% url 'logout' %}" class="block text-gray-700 hover:text-blue-600 transition">Logout</a>
                 {% else %}
                     <a href="{% url 'register' %}" class="block text-gray-700 hover:text-blue-600 transition">Register</a>
