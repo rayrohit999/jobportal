@@ -2,6 +2,7 @@ from django.core.mail import send_mail,EmailMultiAlternatives
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from hub_apps.jobs.models import Job
+from hub_apps.profiles.models import UserProfile
 from hub_apps.applications.models import JobApplication
 from .forms import JobApplicationForm
 from django.template.loader import render_to_string
