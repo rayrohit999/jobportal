@@ -7,6 +7,8 @@ from .forms import JobApplicationForm
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from django.core.paginator import Paginator
+from django.contrib.sites.shortcuts import get_current_site
+
 
 @login_required
 def apply_for_job(request, job_id):
@@ -22,6 +24,29 @@ def apply_for_job(request, job_id):
             application.job = job
             application.applicant = request.user
             application.save()
+
+            # Send confirmation email
+            current_site = get_current_site(request)
+            protocol = 'https' if request.is_secure() else 'http'
+            domain = current_site.domain
+
+            subject = "Your Job Application Confirmation - CareerHub"
+            html_message = render_to_string('emails/application_confirmation_email.html', {
+                'applicant': request.user.username,
+                'job_title': job.title,
+                'company': job.company,
+                'applied_at': application.applied_at,
+                'protocol': protocol,
+                'domain': domain,
+            })
+            plain_message = strip_tags(html_message)
+
+            email = EmailMultiAlternatives(
+                subject, plain_message, 'your-email@gmail.com', [request.user.email]
+            )
+            email.attach_alternative(html_message, "text/html")
+            email.send()
+
             return redirect('list_jobs')  # Redirect after successful application
     else:
         form = JobApplicationForm()
@@ -46,28 +71,38 @@ from django.urls import reverse
 def update_application_status(request, application_id):
     if request.method == 'POST' and request.user.is_recruiter:
         application = get_object_or_404(JobApplication, id=application_id, job__posted_by=request.user)
-        old_status = application.status
-        new_status = request.POST.get('status', 'Pending')
+        
+        # Only allow update if status is still "Pending"
+        if application.status != "Pending":
+            return HttpResponseRedirect(reverse('view_applications'))  # No change if already set
 
-        if old_status != new_status:
-            application.status = new_status
-            application.save()
+        # Determine new status from button clicked
+        if 'accept' in request.POST:
+            new_status = "Accepted"
+        elif 'reject' in request.POST:
+            new_status = "Rejected"
+        else:
+            return HttpResponseRedirect(reverse('view_applications'))  # Invalid action
 
-            # Render the email template
-            subject = "Your Job Application Status Updated"
-            html_message = render_to_string('emails/application_status_update.html', {
-                'applicant': application.applicant.username,
-                'job_title': application.job.title,
-                'company': application.job.company,
-                'status': new_status,
-            })
-            plain_message = strip_tags(html_message)  # Convert HTML to plain text
+        # Update status and save
+        application.status = new_status
+        application.save()
 
-            email = EmailMultiAlternatives(subject, plain_message, 'your-email@gmail.com', [application.applicant.email])
-            email.attach_alternative(html_message, "text/html")
-            email.send()
+        # Send email notification
+        subject = "Your Job Application Status Updated"
+        html_message = render_to_string('emails/application_status_update.html', {
+            'applicant': application.applicant.username,
+            'job_title': application.job.title,
+            'company': application.job.company,
+            'status': new_status,
+        })
+        plain_message = strip_tags(html_message)
+        email = EmailMultiAlternatives(subject, plain_message, 'your-email@gmail.com', [application.applicant.email])
+        email.attach_alternative(html_message, "text/html")
+        email.send()
 
         return HttpResponseRedirect(reverse('view_applications'))
+    return HttpResponseRedirect(reverse('view_applications'))
 
 @login_required
 def track_applications(request):

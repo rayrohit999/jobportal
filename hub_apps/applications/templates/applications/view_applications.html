@@ -50,17 +50,21 @@
                                 </p>
                             </div>
                             <div class="mt-4 sm:mt-0 sm:ml-4">
-                                <form method="POST" action="{% url 'update_application_status' application.id %}" class="space-y-3">
-                                    {% csrf_token %}
-                                    <select name="status" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-700">
-                                        <option value="Pending" {% if application.status == "Pending" %}selected{% endif %}>Pending</option>
-                                        <option value="Accepted" {% if application.status == "Accepted" %}selected{% endif %}>Accepted</option>
-                                        <option value="Rejected" {% if application.status == "Rejected" %}selected{% endif %}>Rejected</option>
-                                    </select>
-                                    <button type="submit" class="w-full px-4 py-2 bg-blue-600 text-white font-medium rounded-full hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition">
-                                        Update Status
-                                    </button>
-                                </form>
+                                {% if application.status == "Pending" %}
+                                    <form method="POST" action="{% url 'update_application_status' application.id %}" class="space-y-3">
+                                        {% csrf_token %}
+                                        <button type="submit" name="accept" value="accept" class="w-full px-4 py-2 bg-green-600 text-white font-medium rounded-full hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition">
+                                            Accept
+                                        </button>
+                                        <button type="submit" name="reject" value="reject" class="w-full px-4 py-2 bg-red-600 text-white font-medium rounded-full hover:bg-red-700 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition">
+                                            Reject
+                                        </button>
+                                    </form>
+                                {% else %}
+                                    <p class="text-center px-4 py-2 rounded-full font-medium text-white {% if application.status == 'Accepted' %}bg-green-600{% else %}bg-red-600{% endif %}">
+                                        {{ application.status }}
+                                    </p>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
