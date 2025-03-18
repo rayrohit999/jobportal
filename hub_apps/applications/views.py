@@ -15,9 +15,6 @@ def apply_for_job(request, job_id):
     if request.user.is_recruiter:
         return redirect('list_jobs')  # Prevent recruiters from applying
 
-    if JobApplication.objects.filter(job=job, applicant=request.user).exists():
-        return render(request, 'applications/applied_already.html')  # Show already applied message
-
     if request.method == 'POST':
         form = JobApplicationForm(request.POST)
         if form.is_valid():
@@ -90,8 +87,3 @@ def view_job_applicants(request, job_id):
     applications = JobApplication.objects.filter(job=job).select_related('applicant')
 
     return render(request, 'applications/view_job_applicants.html', {'job': job, 'applications': applications})
-
-
-
-
-

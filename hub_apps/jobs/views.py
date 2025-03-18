@@ -1,8 +1,9 @@
-from django.shortcuts import render, redirect,get_object_or_404
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from .forms import JobForm
 from .models import Job
 from django.core.paginator import Paginator
+from hub_apps.applications.models import JobApplication  # Import JobApplication
 
 @login_required
 def post_job(request):
@@ -21,8 +22,6 @@ def post_job(request):
 
     return render(request, 'jobs/post_job.html', {'form': form})
 
-
-
 def list_jobs(request):
     jobs = Job.objects.filter(is_active=True)  # Show only active jobs
 
@@ -31,7 +30,6 @@ def list_jobs(request):
     job_type_filter = request.GET.get('job_type', '')
     location_filter = request.GET.get('location', '')
     sort_option = request.GET.get('sort', 'newest')  # Default: Newest jobs first
-
 
     if search_query:
         jobs = jobs.filter(title__icontains=search_query)
@@ -45,12 +43,17 @@ def list_jobs(request):
     if sort_option == 'newest':
         jobs = jobs.order_by('-created_at')  # Newest jobs first
     elif sort_option == 'highest_salary':
-        jobs = jobs.order_by('-salary')  # Highest salary first
-
+        jobs = jobs.order_by('-salary')  # Highest salary first (nulls last implicitly)
 
     paginator = Paginator(jobs, 5)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
+
+    # Add has_applied status for authenticated non-recruiter users
+    if request.user.is_authenticated and not request.user.is_recruiter:
+        applied_job_ids = JobApplication.objects.filter(applicant=request.user).values_list('job__id', flat=True)
+        for job in page_obj:
+            job.has_applied = job.id in applied_job_ids
 
     return render(request, 'jobs/list_jobs.html', {
         'page_obj': page_obj,
@@ -59,8 +62,6 @@ def list_jobs(request):
         'location_filter': location_filter,
         'sort_option': sort_option,
     })
-
-
 
 @login_required
 def edit_job(request, job_id):

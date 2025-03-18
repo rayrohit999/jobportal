@@ -14,47 +14,61 @@
 </head>
 <body class="font-sans antialiased bg-gray-50">
     <!-- Navbar -->
-    <nav class="bg-white shadow-lg sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16 items-center">
-                <div class="flex items-center">
-                    <a href="{% url 'home' %}" class="text-2xl font-bold text-blue-600">CareerHub</a>
+    {% block navbar %}
+        {% if request.resolver_match.url_name == 'dashboard' %}
+            <!-- Simplified Navbar for Dashboard -->
+            <nav class="bg-white shadow-lg sticky top-0 z-50">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="flex justify-center h-16 items-center">
+                        <a href="{% url 'home' %}" class="text-2xl font-bold text-blue-600">CareerHub</a>
+                    </div>
                 </div>
-                <div class="hidden md:flex items-center space-x-8">
-                    <a href="{% url 'home' %}" class="text-gray-700 hover:text-blue-600 transition">Home</a>
-                    <a href="{% url 'list_jobs' %}" class="text-gray-700 hover:text-blue-600 transition">Find Jobs</a>
-                    {% if user.is_authenticated %}
-                        <a href="{% url 'dashboard' %}" class="text-gray-700 hover:text-blue-600 transition">Dashboard</a>
-                        <a href="{% url 'logout' %}" class="text-gray-700 hover:text-blue-600 transition">Logout</a>
-                    {% else %}
-                        <a href="{% url 'register' %}" class="text-gray-700 hover:text-blue-600 transition">Register</a>
-                        <a href="{% url 'login' %}" class="text-gray-700 hover:text-blue-600 transition">Login</a>
-                    {% endif %}
+            </nav>
+        {% else %}
+            <!-- Full Navbar for Other Pages -->
+            <nav class="bg-white shadow-lg sticky top-0 z-50">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="flex justify-between h-16 items-center">
+                        <div class="flex items-center">
+                            <a href="{% url 'home' %}" class="text-2xl font-bold text-blue-600">CareerHub</a>
+                        </div>
+                        <div class="hidden md:flex items-center space-x-8">
+                            <a href="{% url 'home' %}" class="text-gray-700 hover:text-blue-600 transition">Home</a>
+                            <a href="{% url 'list_jobs' %}" class="text-gray-700 hover:text-blue-600 transition">Find Jobs</a>
+                            {% if user.is_authenticated %}
+                                <a href="{% url 'dashboard' %}" class="text-gray-700 hover:text-blue-600 transition">Dashboard</a>
+                                <a href="{% url 'logout' %}" class="text-gray-700 hover:text-blue-600 transition">Logout</a>
+                            {% else %}
+                                <a href="{% url 'register' %}" class="text-gray-700 hover:text-blue-600 transition">Register</a>
+                                <a href="{% url 'login' %}" class="text-gray-700 hover:text-blue-600 transition">Login</a>
+                            {% endif %}
+                        </div>
+                        <div class="md:hidden">
+                            <button class="mobile-menu-button p-2" onclick="toggleMobileMenu()">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
                 </div>
-                <div class="md:hidden">
-                    <button class="mobile-menu-button p-2" onclick="toggleMobileMenu()">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-                        </svg>
-                    </button>
+                <!-- Mobile Menu -->
+                <div id="mobile-menu" class="hidden md:hidden bg-white shadow-lg">
+                    <div class="px-4 py-2 space-y-2">
+                        <a href="{% url 'home' %}" class="block text-gray-700 hover:text-blue-600 transition">Home</a>
+                        <a href="{% url 'list_jobs' %}" class="block text-gray-700 hover:text-blue-600 transition">Find Jobs</a>
+                        {% if user.is_authenticated %}
+                            <a href="{% url 'dashboard' %}" class="block text-gray-700 hover:text-blue-600 transition">Dashboard</a>
+                            <a href="{% url 'logout' %}" class="block text-gray-700 hover:text-blue-600 transition">Logout</a>
+                        {% else %}
+                            <a href="{% url 'register' %}" class="block text-gray-700 hover:text-blue-600 transition">Register</a>
+                            <a href="{% url 'login' %}" class="block text-gray-700 hover:text-blue-600 transition">Login</a>
+                        {% endif %}
+                    </div>
                 </div>
-            </div>
-        </div>
-        <!-- Mobile Menu -->
-        <div id="mobile-menu" class="hidden md:hidden bg-white shadow-lg">
-            <div class="px-4 py-2 space-y-2">
-                <a href="{% url 'home' %}" class="block text-gray-700 hover:text-blue-600 transition">Home</a>
-                <a href="{% url 'list_jobs' %}" class="block text-gray-700 hover:text-blue-600 transition">Find Jobs</a>
-                {% if user.is_authenticated %}
-                    <a href="{% url 'dashboard' %}" class="block text-gray-700 hover:text-blue-600 transition">Dashboard</a>
-                    <a href="{% url 'logout' %}" class="block text-gray-700 hover:text-blue-600 transition">Logout</a>
-                {% else %}
-                    <a href="{% url 'register' %}" class="block text-gray-700 hover:text-blue-600 transition">Register</a>
-                    <a href="{% url 'login' %}" class="block text-gray-700 hover:text-blue-600 transition">Login</a>
-                {% endif %}
-            </div>
-        </div>
-    </nav>
+            </nav>
+        {% endif %}
+    {% endblock navbar %}
 
     <!-- Main Content -->
     <main>
@@ -176,7 +190,7 @@
         </div>
     </footer>
 
-    <!-- Base Scripts (Moved from block to ensure always present) -->
+    <!-- Base Scripts -->
     <script>
         function toggleMobileMenu() {
             const mobileMenu = document.getElementById('mobile-menu');
