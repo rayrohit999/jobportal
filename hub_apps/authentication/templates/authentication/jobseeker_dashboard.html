@@ -8,7 +8,7 @@
 {% block content %}
     <div class="flex min-h-screen bg-gray-50">
         <!-- Sidebar -->
-        <div class="hidden md:flex md:w-64 bg-gray-900 text-white flex-col flex-shrink-0">
+        <div id="sidebar" class="fixed top-16 left-0 bottom-0 z-50 w-64 bg-gray-900 text-white flex-col flex-shrink-0 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out md:flex md:static md:inset-auto">
             <div class="p-6 text-center border-b border-gray-800">
                 {% if user.profile_picture %}
                     <img src="{{ user.profile_picture.url }}" alt="Profile Picture" class="w-24 h-24 rounded-full mx-auto mb-3 border-2 border-gray-600 object-cover">
@@ -48,9 +48,19 @@
 
         <!-- Main Content -->
         <main class="flex-1 p-6 md:p-8 overflow-y-auto">
+            <!-- Mobile Sidebar Toggle Button -->
+            <div class="md:hidden flex justify-between items-center mb-4">
+                <button id="sidebar-toggle" class="p-2 fixed top-3 right-3 z-50 rounded-lg hover:bg-gray-300 focus:ring-2 focus:ring-blue-500">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
+                <h1 class="text-xl font-bold text-gray-900">Welcome, {{ user.username }}!</h1>
+            </div>
+
             <!-- Header -->
-            <div class="flex justify-between items-center mb-6 border-b border-gray-200 pb-4">
-                <h1 class="text-2xl font-bold text-gray-900">Welcome, {{ user.username }}!</h1>
+            <div class="flex justify-between items-center mb-6 border-b border-gray-200 pb-4 md:mt-0">
+                <h1 class="text-2xl font-bold text-gray-900 hidden md:block">Welcome, {{ user.username }}!</h1>
                 <div class="flex space-x-2">
                     <button class="flex items-center px-3 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
@@ -201,6 +211,20 @@
         document.addEventListener('DOMContentLoaded', function() {
             const main = document.querySelector('main');
             main.classList.add('animate-fade-in');
+
+            const sidebarToggle = document.getElementById('sidebar-toggle');
+            const sidebar = document.getElementById('sidebar');
+
+            sidebarToggle.addEventListener('click', function() {
+                sidebar.classList.toggle('-translate-x-full');
+            });
+
+            // Close sidebar when clicking outside on mobile
+            document.addEventListener('click', function(event) {
+                if (!sidebar.contains(event.target) && !sidebarToggle.contains(event.target) && !sidebar.classList.contains('-translate-x-full')) {
+                    sidebar.classList.add('-translate-x-full');
+                }
+            });
         });
     </script>
 {% endblock %}
