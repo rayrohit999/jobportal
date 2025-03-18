@@ -8,7 +8,7 @@ from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from django.core.paginator import Paginator
 from django.contrib.sites.shortcuts import get_current_site
-
+from django.http import JsonResponse
 
 @login_required
 def apply_for_job(request, job_id):
@@ -17,19 +17,25 @@ def apply_for_job(request, job_id):
     if request.user.is_recruiter:
         return redirect('list_jobs')  # Prevent recruiters from applying
 
-    if request.method == 'POST':
-        form = JobApplicationForm(request.POST)
+    if request.method == 'POST' and request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        form = JobApplicationForm(request.POST, request.FILES)
         if form.is_valid():
             application = form.save(commit=False)
             application.job = job
             application.applicant = request.user
+
+            # Handle resume: Update profile only if a new resume is uploaded
+            if 'resume' in request.FILES and request.FILES['resume']:
+                profile, created = UserProfile.objects.get_or_create(user=request.user)
+                profile.resume = request.FILES['resume']
+                profile.save()
+
             application.save()
 
             # Send confirmation email
             current_site = get_current_site(request)
             protocol = 'https' if request.is_secure() else 'http'
             domain = current_site.domain
-
             subject = "Your Job Application Confirmation - CareerHub"
             html_message = render_to_string('emails/application_confirmation_email.html', {
                 'applicant': request.user.username,
@@ -40,17 +46,17 @@ def apply_for_job(request, job_id):
                 'domain': domain,
             })
             plain_message = strip_tags(html_message)
-
-            email = EmailMultiAlternatives(
-                subject, plain_message, 'your-email@gmail.com', [request.user.email]
-            )
+            email = EmailMultiAlternatives(subject, plain_message, 'your-email@gmail.com', [request.user.email])
             email.attach_alternative(html_message, "text/html")
             email.send()
 
-            return redirect('list_jobs')  # Redirect after successful application
+            return JsonResponse({'success': True})
+        else:
+            return JsonResponse({'success': False, 'errors': form.errors})
     else:
         form = JobApplicationForm()
 
+    # Fallback for non-AJAX requests (not used by modal, but kept for completeness)
     return render(request, 'applications/apply.html', {'form': form, 'job': job})
 
 @login_required

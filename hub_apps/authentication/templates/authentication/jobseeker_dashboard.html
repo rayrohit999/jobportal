@@ -302,22 +302,22 @@
                                     </div>
                                     <div class="flex flex-wrap gap-3 mt-4 md:mt-0 md:ml-6">
                                         {% if user.is_authenticated %}
-                                            {% if job.has_applied %}
-                                                <span class="inline-flex items-center px-5 py-3 bg-gray-400 text-white font-medium rounded-xl cursor-not-allowed">
-                                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                                                    </svg>
-                                                    Applied
-                                                </span>
-                                            {% else %}
-                                                <a href="{% url 'apply_for_job' job.id %}" class="inline-flex items-center px-5 py-3 bg-green-600 text-white font-medium rounded-xl hover:bg-green-700 transition">
-                                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                    </svg>
-                                                    Apply Now
-                                                </a>
-                                            {% endif %}
+                                        {% if job.has_applied %}
+                                            <span class="inline-flex items-center px-5 py-3 bg-gray-400 text-white font-medium rounded-xl cursor-not-allowed">
+                                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                                </svg>
+                                                Applied
+                                            </span>
+                                        {% else %}
+                                            <button data-job-id="{{ job.id }}" class="apply-now-btn inline-flex items-center px-5 py-3 bg-green-600 text-white font-medium rounded-xl hover:bg-green-700 transition">
+                                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                </svg>
+                                                Apply Now
+                                            </button>
                                         {% endif %}
+                                    {% endif %}
                                     </div>
                                 </div>
                             </div>
@@ -490,81 +490,156 @@
                         <button type="submit" class="w-full px-6 py-3 bg-blue-600 text-white font-medium rounded-full hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition">Save Changes</button>
                     </form>
                 </div>
+                <!-- Apply Job Modal -->
+<div id="apply-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden z-50 flex items-center justify-center">
+    <div class="bg-white rounded-xl shadow-lg p-6 w-full max-w-md">
+        <div class="flex justify-between items-center border-b border-gray-200 pb-4">
+            <h2 class="text-xl font-semibold text-gray-900">Apply for Job</h2>
+            <button id="close-modal" class="text-gray-500 hover:text-gray-700">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+        <form id="apply-form" method="POST" action="{% url 'apply_for_job' 0 %}" class="space-y-4 mt-4" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="hidden" name="job_id" id="apply-job-id">
+            <div>
+                <label for="resume" class="block text-sm font-medium text-gray-700">Upload Resume</label>
+                <input type="file" name="resume" id="resume" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+            </div>
+            <div>
+                <label for="cover_letter" class="block text-sm font-medium text-gray-700">Cover Letter (Optional)</label>
+                <textarea name="cover_letter" id="cover_letter" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" rows="4" placeholder="Write a brief cover letter..."></textarea>
+            </div>
+            <button type="submit" class="w-full px-4 py-2 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700">Submit Application</button>
+        </form>
+        <div id="apply-success" class="hidden text-green-600 text-center mt-4">Application submitted successfully!</div>
+    </div>
+</div>
             </div>
         </main>
     </div>
 {% endblock %}
 
 {% block extra_scripts %}
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const sidebarToggle = document.getElementById('sidebar-toggle');
-            const sidebar = document.getElementById('sidebar');
-            const tabLinks = document.querySelectorAll('.tab-link');
-            const tabPanes = document.querySelectorAll('.tab-pane');
-            const paginationLinks = document.querySelectorAll('nav a'); // Pagination links
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const sidebarToggle = document.getElementById('sidebar-toggle');
+    const sidebar = document.getElementById('sidebar');
+    const tabLinks = document.querySelectorAll('.tab-link');
+    const tabPanes = document.querySelectorAll('.tab-pane');
+    const paginationLinks = document.querySelectorAll('nav a');
+    const applyModal = document.getElementById('apply-modal');
+    const closeModal = document.getElementById('close-modal');
+    const applyForm = document.getElementById('apply-form');
+    const applySuccess = document.getElementById('apply-success');
+    const applyJobId = document.getElementById('apply-job-id');
 
-            // Sidebar toggle for mobile
-            sidebarToggle.addEventListener('click', function() {
-                sidebar.classList.toggle('-translate-x-full');
-            });
+    // Sidebar toggle for mobile
+    sidebarToggle.addEventListener('click', function() {
+        sidebar.classList.toggle('-translate-x-full');
+    });
 
-            // Close sidebar when clicking outside on mobile
-            document.addEventListener('click', function(event) {
-                if (!sidebar.contains(event.target) && !sidebarToggle.contains(event.target) && !sidebar.classList.contains('-translate-x-full')) {
-                    sidebar.classList.add('-translate-x-full');
+    // Close sidebar when clicking outside on mobile
+    document.addEventListener('click', function(event) {
+        if (!sidebar.contains(event.target) && !sidebarToggle.contains(event.target) && !sidebar.classList.contains('-translate-x-full')) {
+            sidebar.classList.add('-translate-x-full');
+        }
+    });
+
+    // Tab switching for sidebar links
+    tabLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const tabId = this.getAttribute('data-tab');
+            tabPanes.forEach(pane => {
+                pane.classList.add('hidden');
+                if (pane.id === tabId) {
+                    pane.classList.remove('hidden');
+                    pane.classList.add('animate-fade-in');
                 }
             });
-
-            // Tab switching for sidebar links
-            tabLinks.forEach(link => {
-                link.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const tabId = this.getAttribute('data-tab');
-
-                    tabPanes.forEach(pane => {
-                        pane.classList.add('hidden');
-                        if (pane.id === tabId) {
-                            pane.classList.remove('hidden');
-                            pane.classList.add('animate-fade-in');
-                        }
-                    });
-
-                    tabLinks.forEach(l => l.classList.remove('bg-gray-800', 'text-white', 'border-blue-500'));
-                    this.classList.add('bg-gray-800', 'text-white', 'border-blue-500');
-
-                    // Update URL hash without reloading
-                    history.pushState({}, '', `#${tabId}`);
-                });
-            });
-
-            // Ensure pagination links don’t trigger tab switching
-            paginationLinks.forEach(link => {
-                link.addEventListener('click', function(e) {
-                    // Let the browser handle the GET request naturally
-                    // No need to preventDefault here unless using AJAX
-                });
-            });
-
-            // Restore tab state from server or URL hash on load
-            const serverTab = "{{ active_tab }}"; // From Django context
-            const hashTab = window.location.hash.replace('#', '');
-            const initialTab = hashTab || serverTab;
-
-            if (initialTab) {
-                tabPanes.forEach(pane => {
-                    pane.classList.add('hidden');
-                    if (pane.id === initialTab) {
-                        pane.classList.remove('hidden');
-                    }
-                });
-                tabLinks.forEach(link => {
-                    link.classList.remove('bg-gray-800', 'text-white', 'border-blue-500');
-                    if (link.getAttribute('data-tab') === initialTab) {
-                        link.classList.add('bg-gray-800', 'text-white', 'border-blue-500');
-                    }
-                });
-            }
+            tabLinks.forEach(l => l.classList.remove('bg-gray-800', 'text-white', 'border-blue-500'));
+            this.classList.add('bg-gray-800', 'text-white', 'border-blue-500');
+            history.pushState({}, '', `#${tabId}`);
         });
-    </script>
+    });
+
+    // Handle Apply Now button clicks
+    document.querySelectorAll('.apply-now-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const jobId = this.getAttribute('data-job-id');
+            if (!jobId || jobId === '0') {
+                alert('Error: No valid job ID found. Please contact support.');
+                return;
+            }
+            applyJobId.value = jobId;
+            applyModal.classList.remove('hidden');
+            applySuccess.classList.add('hidden');
+        });
+    });
+
+    // Close modal
+    closeModal.addEventListener('click', function() {
+        applyModal.classList.add('hidden');
+    });
+
+    // Handle form submission via AJAX
+    applyForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        const jobId = applyJobId.value;
+        if (!jobId || jobId === '0') {
+            alert('Error: Job ID not set. Please try again.');
+            return;
+        }
+        const url = `/applications/apply/${jobId}/`;
+        const csrfToken = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
+
+        fetch(url, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': csrfToken,
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.text().then(text => { throw new Error(`HTTP error! status: ${response.status}, response: ${text}`); });
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                applyForm.reset();
+                applySuccess.classList.remove('hidden');
+                setTimeout(() => {
+                    applyModal.classList.add('hidden');
+                    location.reload();
+                }, 2000);
+            } else {
+                let errorMessage = 'Error submitting application. Please try again.';
+                if (data.errors) {
+                    errorMessage = Object.values(data.errors).flat().join(' ');
+                } else if (data.error) {
+                    errorMessage = data.error;
+                }
+                alert(errorMessage);
+            }
+        })
+        .catch(error => {
+            alert(`Failed to submit application: ${error.message}.`);
+        });
+    });
+
+    // Close modal when clicking outside
+    window.addEventListener('click', function(event) {
+        if (event.target === applyModal) {
+            applyModal.classList.add('hidden');
+        }
+    });
+});
+</script>
 {% endblock %}
