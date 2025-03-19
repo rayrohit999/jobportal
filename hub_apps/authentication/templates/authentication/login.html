@@ -75,6 +75,13 @@
                             {% endif %}
                         </div>
                     {% endfor %}
+                    {% if form.non_field_errors %}
+                        <div class="mb-4 p-3 bg-red-100 text-red-700 rounded-md">
+                    {% for error in form.non_field_errors %}
+                            <p>{{ error }}</p>
+                    {% endfor %}
+                        </div>
+                    {% endif %} 
                 </div>
 
                 <!-- Submit Button -->

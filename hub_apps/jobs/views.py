@@ -4,22 +4,34 @@ from .forms import JobForm
 from .models import Job
 from django.core.paginator import Paginator
 from hub_apps.applications.models import JobApplication  # Import JobApplication
+from hub_apps.profiles.models import UserProfile
 
 @login_required
 def post_job(request):
-    if not request.user.is_recruiter:
-        return redirect('dashboard')  # Prevent job seekers from posting
+    user = request.user  # Get logged-in user
+    
+    try:
+        user_profile = UserProfile.objects.get(user=user)  # Ensure profile exists
+    except UserProfile.DoesNotExist:
+        return redirect('edit_profile')  # Redirect user to complete their profile
+
+    if not user.is_recruiter:
+        return redirect('list_jobs')  # Only recruiters can post jobs
+
+    # Pre-fill the form with company name
+    initial_data = {'company': user_profile.company_name}
 
     if request.method == 'POST':
         form = JobForm(request.POST)
         if form.is_valid():
             job = form.save(commit=False)
-            job.posted_by = request.user  # Assign recruiter as the job owner
+            job.company = user_profile.company_name  # Assign recruiter's company
+            job.posted_by = user  # Link job to recruiter
             job.save()
-            return redirect('list_jobs')  # Redirect to job listing after posting
+            return redirect('list_jobs')
     else:
-        form = JobForm()
-
+        form = JobForm(initial=initial_data)  # Pre-fill company name
+    
     return render(request, 'jobs/post_job.html', {'form': form})
 
 def list_jobs(request):

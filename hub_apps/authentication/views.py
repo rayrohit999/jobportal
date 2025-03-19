@@ -8,6 +8,7 @@ from hub_apps.applications.models import JobApplication
 from hub_apps.jobs.models import Job
 from django.core.paginator import Paginator
 from hub_apps.profiles.forms import UserProfileForm
+from django.contrib import messages
 
 def register_user(request):
     if request.method == 'POST':
@@ -15,10 +16,15 @@ def register_user(request):
         if form.is_valid():
             user = form.save(commit=False)
             user.save()
-            login(request, user)  # Auto login after registration
-            return redirect('dashboard')  # Redirect to a dashboard page
+            login(request, user)  # ✅ Auto login after successful registration
+            messages.success(request, "Registration successful! Welcome to CareerHub.")  # ✅ Success message
+            return redirect('dashboard')  
+        else:
+            messages.error(request, "There was an error with your registration. Please check the form.")  # ✅ Error message
+
     else:
         form = UserRegistrationForm()
+
     return render(request, 'authentication/register.html', {'form': form})
 
 def login_user(request):
@@ -28,8 +34,12 @@ def login_user(request):
             user = form.get_user()
             login(request, user)
             return redirect('dashboard')
+        else:
+            messages.error(request, "Invalid username or password.")  # ✅ Show error message
+
     else:
         form = UserLoginForm()
+
     return render(request, 'authentication/login.html', {'form': form})
 
 def logout_user(request):
