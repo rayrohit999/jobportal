@@ -128,6 +128,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
@@ -144,5 +145,5 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'  # Use your email provider
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'grouprhsn@gmail.com'  # Replace with your email
-EMAIL_HOST_PASSWORD = 'wpcc wmoj stdk zcrv'  # Use an app password instead of your real password
+EMAIL_HOST_USER = 'carrerhub.com@gmail.com'  # Replace with your email
+EMAIL_HOST_PASSWORD = 'qgpr xywc dczs oysw'  # Use an app password instead of your real password

@@ -5,6 +5,7 @@ from .models import Job
 from django.core.paginator import Paginator
 from hub_apps.applications.models import JobApplication  # Import JobApplication
 from hub_apps.profiles.models import UserProfile
+from django.contrib import messages
 
 @login_required
 def post_job(request):
@@ -13,10 +14,16 @@ def post_job(request):
     try:
         user_profile = UserProfile.objects.get(user=user)  # Ensure profile exists
     except UserProfile.DoesNotExist:
+        messages.warning(request, "Please complete your profile before posting a job.")
         return redirect('edit_profile')  # Redirect user to complete their profile
 
     if not user.is_recruiter:
         return redirect('list_jobs')  # Only recruiters can post jobs
+
+    # Check if company_name is missing or empty
+    if not user_profile.company_name or user_profile.company_name.strip() == "":
+        messages.warning(request, "You must provide a company name in your profile to post a job.")
+        return redirect('edit_profile')
 
     # Pre-fill the form with company name
     initial_data = {'company': user_profile.company_name}
@@ -35,7 +42,13 @@ def post_job(request):
     return render(request, 'jobs/post_job.html', {'form': form})
 
 def list_jobs(request):
-    jobs = Job.objects.filter(is_active=True)  # Show only active jobs
+    # Base queryset: Start with all active jobs
+    jobs = Job.objects.filter(is_active=True)
+
+    # Restrict to jobs posted by the recruiter if user is authenticated and a recruiter
+    if request.user.is_authenticated and request.user.is_recruiter:
+        jobs = jobs.filter(posted_by=request.user)
+    # Job seekers (authenticated, not recruiters) and anonymous users see all active jobs (no additional filter)
 
     # Get search query and filters from request
     search_query = request.GET.get('q', '')
@@ -43,25 +56,26 @@ def list_jobs(request):
     location_filter = request.GET.get('location', '')
     sort_option = request.GET.get('sort', 'newest')  # Default: Newest jobs first
 
+    # Apply search filters
     if search_query:
         jobs = jobs.filter(title__icontains=search_query)
-
     if job_type_filter:
         jobs = jobs.filter(job_type=job_type_filter)
-
     if location_filter:
         jobs = jobs.filter(location__icontains=location_filter)
 
-    if sort_option == 'newest':
-        jobs = jobs.order_by('-created_at')  # Newest jobs first
-    elif sort_option == 'highest_salary':
+    # Apply sorting
+    if sort_option == 'highest_salary':
         jobs = jobs.order_by('-salary')  # Highest salary first (nulls last implicitly)
+    else:  # Default to newest
+        jobs = jobs.order_by('-created_at')  # Newest jobs first
 
+    # Pagination
     paginator = Paginator(jobs, 5)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
-    # Add has_applied status for authenticated non-recruiter users
+    # Add has_applied status for authenticated non-recruiter users (job seekers)
     if request.user.is_authenticated and not request.user.is_recruiter:
         applied_job_ids = JobApplication.objects.filter(applicant=request.user).values_list('job__id', flat=True)
         for job in page_obj:

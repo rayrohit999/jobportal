@@ -65,18 +65,6 @@
             <!-- Header -->
             <div class="flex justify-between items-center mb-6 border-b border-gray-200 pb-4 md:mt-0">
                 <h1 class="text-2xl font-bold text-gray-900 hidden md:block">Recruiter Dashboard</h1>
-                <div class="flex space-x-2">
-                    <div class="relative">
-                        <button class="flex items-center px-3 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
-                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-                            This Month
-                        </button>
-                    </div>
-                    <button class="flex items-center px-3 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" data-bs-toggle="modal" data-bs-target="#exportModal">
-                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
-                        Export
-                    </button>
-                </div>
             </div>
 
             <!-- Stats Overview -->
@@ -207,7 +195,7 @@
                                     {% endif %}
                                     <div class="flex-1">
                                         <div class="flex justify-between items-center">
-                                            <h6 class="text-sm font-semibold text-gray-800">{{ application.applicant.get_full_name }}</h6>
+                                            <h6 class="text-sm font-semibold text-gray-800">{{ application.applicant.username }}</h6>
                                             <span class="px-2 py-1 text-xs font-medium rounded-full {% if application.status == 'Pending' %}bg-yellow-100 text-yellow-800{% elif application.status == 'Accepted' %}bg-green-100 text-green-800{% elif application.status == 'Rejected' %}bg-red-100 text-red-800{% endif %}">
                                                 {{ application.status }}
                                             </span>

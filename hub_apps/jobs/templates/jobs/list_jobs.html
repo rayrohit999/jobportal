@@ -10,7 +10,13 @@
             <!-- Page Header with improved styling -->
             <div class="text-center mb-12">
                 <h2 class="text-4xl font-extrabold text-gray-900 mb-2 tracking-tight">Job Listings</h2>
-                <p class="text-xl text-gray-600 max-w-3xl mx-auto">Explore career opportunities that match your skills and preferences</p>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                    {% if user.is_authenticated and user.is_recruiter %}
+                        View and manage jobs posted by you
+                    {% else %}
+                        Explore career opportunities that match your skills and preferences
+                    {% endif %}
+                </p>
             </div>
 
             <!-- Enhanced Search, Filter & Sort Form -->

@@ -11,6 +11,8 @@ from hub_apps.profiles.forms import UserProfileForm
 from django.contrib import messages
 
 def register_user(request):
+    if request.user.is_authenticated:  # ✅ Check if user is already logged in
+        return redirect('dashboard')
     if request.method == 'POST':
         form = UserRegistrationForm(request.POST, request.FILES)
         if form.is_valid():
@@ -28,6 +30,8 @@ def register_user(request):
     return render(request, 'authentication/register.html', {'form': form})
 
 def login_user(request):
+    if request.user.is_authenticated:  
+        return redirect('dashboard')
     if request.method == 'POST':
         form = UserLoginForm(data=request.POST)
         if form.is_valid():
