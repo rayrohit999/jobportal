@@ -87,9 +87,7 @@
 
 {% block extra_scripts %}
     <script>
-        // Add any page-specific JavaScript here
-        document.addEventListener('DOMContentLoaded', function() {
-            // Example: Add animation to job cards
+        document.addEventListener('DOMContentLoaded', function() {    
             const jobCards = document.querySelectorAll('.bg-white.rounded-xl');
             jobCards.forEach(card => {
                 card.addEventListener('mouseenter', () => {

@@ -11,18 +11,18 @@ from hub_apps.profiles.forms import UserProfileForm
 from django.contrib import messages
 
 def register_user(request):
-    if request.user.is_authenticated:  # ✅ Check if user is already logged in
+    if request.user.is_authenticated:  # Check if user is already logged in
         return redirect('dashboard')
     if request.method == 'POST':
         form = UserRegistrationForm(request.POST, request.FILES)
         if form.is_valid():
             user = form.save(commit=False)
             user.save()
-            login(request, user)  # ✅ Auto login after successful registration
-            messages.success(request, "Registration successful! Welcome to CareerHub.")  # ✅ Success message
+            messages.success(request, "Registration successful! Welcome to CareerHub.")  #  Success message
+            login(request, user)  # Auto login after successful registration
             return redirect('dashboard')  
         else:
-            messages.error(request, "There was an error with your registration. Please check the form.")  # ✅ Error message
+            messages.error(request, "There was an error with your registration. Please check the form.")  # Error message
 
     else:
         form = UserRegistrationForm()
@@ -39,7 +39,7 @@ def login_user(request):
             login(request, user)
             return redirect('dashboard')
         else:
-            messages.error(request, "Invalid username or password.")  # ✅ Show error message
+            messages.error(request, "Invalid username or password.")  #  Show error message
 
     else:
         form = UserLoginForm()
@@ -59,8 +59,8 @@ def dashboard(request):
     # Ensure active_tab is set from the URL parameter, defaulting to 'overview'
     active_tab = request.GET.get('tab', 'overview')  # Always prioritize GET parameter
 
-    if user.is_recruiter:
-        # Existing Recruiter Dashboard Logic (unchanged)
+    if user.is_recruiter: 
+        #logic for recruiter dashboard
         jobs = Job.objects.filter(posted_by=user)
         active_jobs_count = jobs.filter(is_active=True).count()
         total_applications = JobApplication.objects.filter(job__posted_by=user).count()
@@ -79,6 +79,7 @@ def dashboard(request):
             'recent_applications': recent_applications,
         })
     elif user.is_superuser:
+        #if user is superuser redirecting to admin dashboard
         return redirect('admin:index')
     else:
         # Job Seeker Dashboard with Tabs

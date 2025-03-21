@@ -135,15 +135,18 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-AUTH_USER_MODEL = 'authentication.CustomUser'
+AUTH_USER_MODEL = 'authentication.CustomUser' #Using CustomUser model for authentication
 
 LOGIN_URL = '/auth/login/'  # Redirect to the correct login page
 LOGIN_REDIRECT_URL = '/auth/dashboard/'  # Redirect after login
 LOGOUT_REDIRECT_URL = '/auth/login/'  # Redirect after logout
 
+
+
+#Settings for sending emails
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'  # Use your email provider
+EMAIL_HOST = 'smtp.gmail.com'  
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'carrerhub.com@gmail.com'  # Replace with your email
-EMAIL_HOST_PASSWORD = 'qgpr xywc dczs oysw'  # Use an app password instead of your real password
+EMAIL_HOST_USER = 'carrerhub.com@gmail.com'  
+EMAIL_HOST_PASSWORD = 'qgpr xywc dczs oysw'  

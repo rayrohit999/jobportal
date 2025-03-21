@@ -1,4 +1,4 @@
-from django.core.mail import send_mail,EmailMultiAlternatives
+from django.core.mail import EmailMultiAlternatives #for sending mail with data passing to templates
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from hub_apps.jobs.models import Job
@@ -10,10 +10,12 @@ from django.utils.html import strip_tags
 from django.core.paginator import Paginator
 from django.contrib.sites.shortcuts import get_current_site
 from django.http import JsonResponse
+from django.http import HttpResponseRedirect
+from django.urls import reverse
 
 @login_required
 def apply_for_job(request, job_id):
-    job = get_object_or_404(Job, id=job_id)
+    job = get_object_or_404(Job, id=job_id) #filtering job based on job id to identify user want to apply for which job
 
     if request.user.is_recruiter:
         return redirect('list_jobs')  # Prevent recruiters from applying
@@ -22,7 +24,7 @@ def apply_for_job(request, job_id):
         form = JobApplicationForm(request.POST, request.FILES)
         if form.is_valid():
             application = form.save(commit=False)
-            application.job = job
+            application.job = job #linking to job internally rather than asking from user
             application.applicant = request.user
 
             # Handle resume: Update profile only if a new resume is uploaded
@@ -46,9 +48,9 @@ def apply_for_job(request, job_id):
                 'protocol': protocol,
                 'domain': domain,
             })
-            plain_message = strip_tags(html_message)
-            email = EmailMultiAlternatives(subject, plain_message, 'your-email@gmail.com', [request.user.email])
-            email.attach_alternative(html_message, "text/html")
+            plain_message = strip_tags(html_message) #converting HTML messages to plain text for backup if any mailbox doesnot support HTML
+            email = EmailMultiAlternatives(subject, plain_message, 'carrerhub.com@gmail.com', [request.user.email])
+            email.attach_alternative(html_message, "text/html") #attaching HTML message to email saying if HTML is supported show this fancy email
             email.send()
 
             return JsonResponse({'success': True})
@@ -70,9 +72,6 @@ def view_applications(request):
 
     return render(request, 'applications/view_applications.html', {'applications': applications})
 
-from django.shortcuts import get_object_or_404
-from django.http import HttpResponseRedirect
-from django.urls import reverse
 
 @login_required
 def update_application_status(request, application_id):
