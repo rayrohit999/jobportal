@@ -20,6 +20,13 @@ class UserLoginForm(AuthenticationForm):
     
 
 class CustomPasswordResetForm(PasswordResetForm):
+    def clean_email(self):
+        email = self.cleaned_data["email"]
+        # Check if the email exists and is tied to an active user
+        if not CustomUser.objects.filter(email__iexact=email, is_active=True).exists():
+            raise forms.ValidationError("There is no account associated with this email address.")
+        return email
+    
     def save(self, domain_override=None, subject_template_name='registration/password_reset_subject.txt',
              email_template_name='registration/password_reset_email.txt', use_https=False, token_generator=None,
              from_email=None, request=None, html_email_template_name=None, extra_email_context=None):

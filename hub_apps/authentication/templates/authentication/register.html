@@ -98,9 +98,14 @@
                                     <input type="password"
                                            name="{{ field.name }}"
                                            id="{{ field.id_for_label }}"
-                                           class="w-full pl-10 pr-4 py-2 rounded-md border border-gray-300 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 {% if field.errors %}border-red-500{% endif %}"
+                                           class="w-full pl-10 pr-12 py-2 rounded-md border border-gray-300 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 {% if field.errors %}border-red-500{% endif %}"
                                            placeholder="{{ field.label }}"
                                            {% if field.field.required %}required{% endif %}>
+                                    <button type="button" 
+                                            class="absolute inset-y-0 right-0 pr-3 flex items-center text-sm text-gray-600 hover:text-gray-800 toggle-password"
+                                            data-target="{{ field.id_for_label }}">
+                                        Show
+                                    </button>
                                 </div>
                             
                             {% else %}
@@ -116,16 +121,8 @@
                             {% if field.errors %}
                                 <p class="mt-1 text-xs text-red-600">{{ field.errors.0 }}</p>
                             {% endif %}
-                            
                         </div>
                     {% endfor %}
-                    {% if messages %}
-                    <div class="mb-4 p-3 rounded-md {% if messages.tags == 'error' %}bg-red-100 text-red-700{% else %}bg-green-100 text-green-700{% endif %}">
-                    {% for message in messages %}
-                        <p>{{ message }}</p>
-                    {% endfor %}
-                    </div>
-                    {% endif %}
                 </div>
 
                 <!-- Submit Button -->
@@ -165,6 +162,22 @@
                     const fileNameElement = document.getElementById(`${this.id}_filename`);
                     if (fileNameElement) {
                         fileNameElement.textContent = this.files.length > 0 ? this.files[0].name : 'No file chosen';
+                    }
+                });
+            });
+
+            // Password visibility toggle
+            const toggleButtons = document.querySelectorAll('.toggle-password');
+            toggleButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const targetId = this.getAttribute('data-target');
+                    const passwordInput = document.getElementById(targetId);
+                    if (passwordInput.type === 'password') {
+                        passwordInput.type = 'text';
+                        this.textContent = 'Hide';
+                    } else {
+                        passwordInput.type = 'password';
+                        this.textContent = 'Show';
                     }
                 });
             });
