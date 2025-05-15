@@ -6,6 +6,7 @@ from django.core.paginator import Paginator
 from hub_apps.applications.models import JobApplication  # Import JobApplication
 from hub_apps.profiles.models import UserProfile
 from django.contrib import messages
+from .utils import export_accepted_applicants_to_excel, export_accepted_applicants_to_pdf
 
 @login_required
 def post_job(request):
@@ -110,3 +111,77 @@ def delete_job(request, job_id):
         job.delete()
         return redirect('list_jobs')  # Redirect after deleting
     return render(request, 'jobs/confirm_delete.html', {'job': job})
+
+
+
+@login_required
+def export_accepted_applicants_excel(request):
+    if not request.user.is_recruiter:
+        return render(request, 'jobs/error.html', {'message': 'Only recruiters can export applicants.'})
+    try:
+        profile = UserProfile.objects.get(user=request.user)
+        company_name = profile.company_name
+        if not company_name:
+            return render(request, 'jobs/error.html', {'message': 'Please set your company name in your profile.'})
+    except UserProfile.DoesNotExist:
+        return render(request, 'jobs/error.html', {'message': 'Please complete your profile.'})
+    applications = JobApplication.objects.filter(
+        job__company=company_name,
+        status='Accepted'
+    )
+    if not applications.exists():
+        return render(request, 'jobs/error.html', {'message': f'No accepted applicants found for {company_name}.'})
+    return export_accepted_applicants_to_excel(applications, company_name)
+
+@login_required
+def export_accepted_applicants_pdf(request):
+    if not request.user.is_recruiter:
+        return render(request, 'jobs/error.html', {'message': 'Only recruiters can export applicants.'})
+    try:
+        profile = UserProfile.objects.get(user=request.user)
+        company_name = profile.company_name
+        if not company_name:
+            return render(request, 'jobs/error.html', {'message': 'Please set your company name in your profile.'})
+    except UserProfile.DoesNotExist:
+        return render(request, 'jobs/error.html', {'message': 'Please complete your profile.'})
+    applications = JobApplication.objects.filter(
+        job__company=company_name,
+        status='Accepted'
+    )
+    if not applications.exists():
+        return render(request, 'jobs/error.html', {'message': f'No accepted applicants found for {company_name}.'})
+    return export_accepted_applicants_to_pdf(applications, company_name)
+
+@login_required
+def export_accepted_applicants_by_job_excel(request, job_id):
+    if not request.user.is_recruiter:
+        return render(request, 'jobs/error.html', {'message': 'Only recruiters can export applicants.'})
+    try:
+        profile = UserProfile.objects.get(user=request.user)
+        company_name = profile.company_name
+        if not company_name:
+            return render(request, 'jobs/error.html', {'message': 'Please set your company name in your profile.'})
+    except UserProfile.DoesNotExist:
+        return render(request, 'jobs/error.html', {'message': 'Please complete your profile.'})
+    job = get_object_or_404(Job, id=job_id, company=company_name)
+    applications = JobApplication.objects.filter(job=job, status='Accepted')
+    if not applications.exists():
+        return render(request, 'jobs/error.html', {'message': f'No accepted applicants found for {job.title}.'})
+    return export_accepted_applicants_to_excel(applications, company_name)
+
+@login_required
+def export_accepted_applicants_by_job_pdf(request, job_id):
+    if not request.user.is_recruiter:
+        return render(request, 'jobs/error.html', {'message': 'Only recruiters can export applicants.'})
+    try:
+        profile = UserProfile.objects.get(user=request.user)
+        company_name = profile.company_name
+        if not company_name:
+            return render(request, 'jobs/error.html', {'message': 'Please set your company name in your profile.'})
+    except UserProfile.DoesNotExist:
+        return render(request, 'jobs/error.html', {'message': 'Please complete your profile.'})
+    job = get_object_or_404(Job, id=job_id, company=company_name)
+    applications = JobApplication.objects.filter(job=job, status='Accepted')
+    if not applications.exists():
+        return render(request, 'jobs/error.html', {'message': f'No accepted applicants found for {job.title}.'})
+    return export_accepted_applicants_to_pdf(applications, company_name)

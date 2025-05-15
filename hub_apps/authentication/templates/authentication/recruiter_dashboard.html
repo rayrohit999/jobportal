@@ -8,7 +8,7 @@
 {% block content %}
     <div class="flex min-h-screen bg-gray-50">
         <!-- Sidebar -->
-        <div id="sidebar" class="fixed  top-16 left-0 bottom-0 z-50 w-64 bg-gray-900 text-white flex-col flex-shrink-0 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out md:flex md:static md:inset-auto">
+        <div id="sidebar" class="fixed top-16 left-0 bottom-0 z-50 w-64 bg-gray-900 text-white flex-col flex-shrink-0 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out md:flex md:static md:inset-auto">
             <div class="p-6 text-center border-b border-gray-800">
                 {% if user.profile_picture %}
                     <img src="{{ user.profile_picture.url }}" alt="Profile Picture" class="w-24 h-24 rounded-full mx-auto mb-3 border-2 border-gray-600 object-cover">
@@ -53,8 +53,8 @@
         <!-- Main Content -->
         <main class="flex-1 p-6 md:p-8 overflow-y-auto">
             <!-- Mobile Sidebar Toggle Button -->
-            <div class="md:hidden flex justify-between  items-center mb-4">
-                <button id="sidebar-toggle" class="p-2 fixed top-3 right-3 z-50  rounded-lg bg-gray-0 hover:bg-gray-300 focus:ring-2 focus:ring-blue-500">
+            <div class="md:hidden flex justify-between items-center mb-4">
+                <button id="sidebar-toggle" class="p-2 fixed top-3 right-3 z-50 rounded-lg bg-gray-0 hover:bg-gray-300 focus:ring-2 focus:ring-blue-500">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
                     </svg>
@@ -77,7 +77,9 @@
                 <div class="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-transform transform hover:-translate-y-1">
                     <h6 class="text-sm text-gray-500 mb-2">Total Applications</h6>
                     <p class="text-3xl font-bold text-blue-600">{{ total_applications }}</p>
-                    <div class="mt-3 h-1 bg-gray-200 rounded-full"><div class="h-full bg-green-500 rounded-full" style="width: {{ total_applications|default:0|add:25 }}%"></div></div>
+                    <div class="mt-3 h-1 bg-gray-200 rounded-full"><div class="h-full bg-green-500
+
+ rounded-full" style="width: {{ total_applications|default:0|add:25 }}%"></div></div>
                 </div>
                 <div class="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-transform transform hover:-translate-y-1">
                     <h6 class="text-sm text-gray-500 mb-2">Pending Reviews</h6>
@@ -105,6 +107,14 @@
                             <a href="{% url 'view_applications' %}" class="flex flex-col items-center justify-center p-4 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition">
                                 <svg class="w-6 h-6 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
                                 View Applications
+                            </a>
+                            <a href="{% url 'export_accepted_applicants_excel' %}" class="flex flex-col items-center justify-center p-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+                                <svg class="w-6 h-6 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                                Export Accepted (Excel)
+                            </a>
+                            <a href="{% url 'export_accepted_applicants_pdf' %}" class="flex flex-col items-center justify-center p-4 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition">
+                                <svg class="w-6 h-6 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                                Export Accepted (PDF)
                             </a>
                         </div>
                     </div>
@@ -139,6 +149,8 @@
                                         <div class="space-x-2">
                                             <a href="{% url 'edit_job' job.id %}" class="text-blue-600 hover:text-blue-800 text-sm">Edit</a>
                                             <a href="{% url 'view_job_applicants' job.id %}" class="text-blue-600 hover:text-blue-800 text-sm">Applications</a>
+                                            <a href="{% url 'export_accepted_applicants_by_job_excel' job.id %}" class="text-blue-600 hover:text-blue-800 text-sm">Excel</a>
+                                            <a href="{% url 'export_accepted_applicants_by_job_pdf' job.id %}" class="text-blue-600 hover:text-blue-800 text-sm">PDF</a>
                                         </div>
                                     </div>
                                 </div>
